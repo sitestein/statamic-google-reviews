@@ -1,0 +1,19 @@
+{
+    "name": "sitestein/statamic-google-reviews",
+    "autoload": {
+        "psr-4": {
+            "Sitestein\\GoogleReviews\\": "src"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Google Reviews",
+            "description": "Google Reviews addon"
+        },
+        "laravel": {
+            "providers": [
+                "Sitestein\\GoogleReviews\\ServiceProvider"
+            ]
+        }
+    }
+}
