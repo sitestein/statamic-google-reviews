@@ -14,18 +14,24 @@ class GoogleReviews extends Tags
     public function index()
     {
         if (in_array(null, $this->config())) {
-            return [];
+            return;
         }
 
         $ttl = 60 * 60 * 24; // day
 
-        return Cache::remember('google-reviews', $ttl, function (): Collection {
+        $data = Cache::remember('google-reviews', $ttl, function (): Collection {
             try {
                 return $this->fetch();
             } catch (ConnectionException $e) {
                 return collect([]);
             }
-        })->take($this->limit())->toArray();
+        })->when($this->threshold(), function ($collect) {
+            return $collect->where('rating', '>=', $this->threshold());
+        });
+
+        return $data->when($data->count() >= $this->limit(), function ($collect) {
+            return $collect->random($this->limit());
+        });
     }
 
     protected function fetch()
@@ -77,5 +83,10 @@ class GoogleReviews extends Tags
     protected function limit()
     {
         return $this->params->get('limit') ?: 3;
+    }
+
+    protected function threshold()
+    {
+        return $this->params->get('threshold') ?: 4;
     }
 }
